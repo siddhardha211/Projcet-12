@@ -14,11 +14,13 @@ spec:
       labels:
         app: myapp
     spec:
-      containers:
-        - name: myapp
-          image: project12acr.azurecr.io/myapp:569   # placeholder replaced in Release pipeline
-          ports:
-            - containerPort: 80
+          containers:
+            - name: myapp
+              image: project12acr.azurecr.io/myapp:latest   # placeholder replaced in Release pipeline
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 80
+
           resources:
             requests:
               cpu: "100m"
