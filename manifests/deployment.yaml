@@ -14,8 +14,22 @@ spec:
       labels:
         app: app1-nginx
     spec:
+      imagePullSecrets:               # 👈 required if AKS is not attached to ACR
+        - name: project12acr-auth
       containers:
         - name: app1-nginx
           image: project12acr.azurecr.io/myapp:latest
           ports:
             - containerPort: 80
+          readinessProbe:             # 👈 checks pod is ready
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:              # 👈 restarts container if stuck
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 20
