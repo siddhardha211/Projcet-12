@@ -100,8 +100,11 @@ stages:
                   az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName) --overwrite-existing
 
                   # Update the image in deployment manifest
-                  kubectl set image -f $(Pipeline.Workspace)/kube-manifests/deployment.yaml app1-nginx=$(acrName).azurecr.io/$(imageName):$(tag) --namespace default
+                  kubectl set image deployment/myapp-deployment myapp=$(acrName).azurecr.io/$(imageName):$(tag) --namespace default
 
                   # Apply manifests
-                  kubectl apply -f $(Pipeline.Workspace)/kube-manifests/deployment.yaml --namespace default
-                  kubectl apply -f $(Pipeline.Workspace)/kube-manifests/service.yaml --namespace default
+                   kubectl apply -f $(Pipeline.Workspace)/kube-manifests/deployment.yaml --namespace default
+                   kubectl apply -f $(Pipeline.Workspace)/kube-manifests/service.yaml --namespace default
+
+                  # Validate rollout
+                  kubectl rollout status deployment/myapp-deployment --namespace default
