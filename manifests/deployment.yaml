@@ -14,9 +14,7 @@ spec:
       labels:
         app: app1-nginx
     spec:
-      imagePullSecrets:               
-        - name: project12acr-auth
-      containers:
+          containers:
         - name: app1-nginx
           image: project12acr.azurecr.io/myapp:latest
           imagePullPolicy: Always
