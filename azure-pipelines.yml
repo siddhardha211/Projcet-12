@@ -36,23 +36,22 @@ stages:
           az acr login --name $(acrName)
 
     - task: AzureCLI@2
-      displayName: 'Build Docker Image'
+      displayName: 'Build and Push Multi-Arch Docker Image'
       inputs:
-        azureSubscription: 'New-Connection-Dev'
-        scriptType: 'pscore'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          docker build -t $(acrName).azurecr.io/$(imageName):$(tag) -t $(acrName).azurecr.io/$(imageName):latest .
+         azureSubscription: 'New-Connection-Dev'
+         scriptType: 'bash'
+         scriptLocation: 'inlineScript'
+         inlineScript: |
+           docker run --privileged --rm tonistiigi/binfmt --install all
+           docker buildx create --name multiarch --use || docker buildx use multiarch
+           docker buildx inspect --bootstrap
+           docker buildx build \
+           --no-cache \
+           --platform linux/amd64,linux/arm64 \
+           -t $(acrName).azurecr.io/$(imageName):$(tag) \
+           -t $(acrName).azurecr.io/$(imageName):latest \
+           --push .
 
-    - task: AzureCLI@2
-      displayName: 'Push Docker Image'
-      inputs:
-        azureSubscription: 'New-Connection-Dev'
-        scriptType: 'pscore'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          docker push $(acrName).azurecr.io/$(imageName):$(tag)
-          docker push $(acrName).azurecr.io/$(imageName):latest
 
     - task: CopyFiles@2
       displayName: Copy Kubernetes Manifests
