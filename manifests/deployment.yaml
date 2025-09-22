@@ -5,7 +5,7 @@ metadata:
   labels:
     app: myapp
 spec:
-  replicas: 1
+  replicas: 3   # You can scale as needed
   selector:
     matchLabels:
       app: myapp
@@ -15,7 +15,23 @@ spec:
         app: myapp
     spec:
       containers:
-      - name: myapp
-        image: project12acr.azurecr.io/myapp:latest
-        ports:
-        - containerPort: 8080
+        - name: myapp
+          image: project12acr.azurecr.io/myapp:latest   # pipeline will update tag
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080   # change if your app listens on different port
+          env:
+            - name: NODE_ENV
+              value: "production"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10

@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: myapp-service
 spec:
-  type: LoadBalancer
+  type: LoadBalancer   # exposes externally via Azure Load Balancer
   selector:
     app: myapp
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080   # must match containerPort above
+      targetPort: 8080   # same as containerPort
