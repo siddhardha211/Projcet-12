@@ -5,7 +5,7 @@ metadata:
   labels:
     app: myapp
 spec:
-  replicas: 3   # scale as needed
+  replicas: 2   # scale as needed
   strategy:
     type: RollingUpdate
     rollingUpdate:
