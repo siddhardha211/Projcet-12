@@ -5,7 +5,12 @@ metadata:
   labels:
     app: myapp
 spec:
-  replicas: 3   # You can scale as needed
+  replicas: 3   # scale as needed
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   # allow 1 pod to be down during update
+      maxSurge: 2         # start 2 extra pods during rollout for faster replacement
   selector:
     matchLabels:
       app: myapp
@@ -15,23 +20,27 @@ spec:
         app: myapp
     spec:
       containers:
-        - name: myapp
-          image: project12acr.azurecr.io/myapp:latest   # pipeline will update tag
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8080   # change if your app listens on different port
-          env:
-            - name: NODE_ENV
-              value: "production"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 10
+      - name: myapp
+        image: project12acr.azurecr.io/myapp:latest   # pipeline replaces tag
+        imagePullPolicy: IfNotPresent   # speeds up deploys in dev (doesn't pull if already present)
+        ports:
+        - containerPort: 80             # Nginx default
+        env:
+        - name: NODE_ENV
+          value: "production"
+
+        # Faster probes (dev-optimized)
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3   # start checking sooner
+          periodSeconds: 3         # check more frequently
+          failureThreshold: 2
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 6
+          periodSeconds: 5
+          failureThreshold: 2
