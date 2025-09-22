@@ -1,34 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app1-nginx-deployment
+  name: myapp-deployment
   labels:
-    app: app1-nginx
+    app: myapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app1-nginx
+      app: myapp
   template:
     metadata:
       labels:
-        app: app1-nginx
+        app: myapp
     spec:
-          containers:
-        - name: app1-nginx
-          image: project12acr.azurecr.io/myapp:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-          readinessProbe:             
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:              
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 20
+      containers:
+      - name: myapp
+        image: project12acr.azurecr.io/myapp:latest
+        ports:
+        - containerPort: 8080
