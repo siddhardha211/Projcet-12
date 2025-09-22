@@ -1,13 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app1-nginx-loadbalancer-service
-  labels:
-    app: app1-nginx
+  name: myapp-service
 spec:
   type: LoadBalancer
   selector:
-    app: app1-nginx
+    app: myapp
   ports:
-    - port: 80
-      targetPort: 80
+    - protocol: TCP
+      port: 80
+      targetPort: 8080   # must match containerPort above
